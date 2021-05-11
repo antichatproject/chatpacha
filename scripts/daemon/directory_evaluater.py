@@ -50,7 +50,7 @@ class DirectoryEvaluater:
     all_file_paths = list(snap_dir.glob('*'))
     for image_path in all_file_paths:
       if self.should_process_image(image_path):
-        self.loop.create_task(self.process_image(image_path))
+        self.loop.create_task(self.process_image(image_path, False))
     while True:
       event = await self.watcher.get_event()
       name, extension = os.path.splitext(event.name)
@@ -74,7 +74,7 @@ class DirectoryEvaluater:
     return keras.preprocessing.image.load_img(image_path, target_size=(self.thub_height, self.thub_width))
 
   async def process_image(self, image_path, send_notification = False):
-    await asyncio.sleep(5)
+    await asyncio.sleep(2)
     filename = os.path.basename(image_path)
     path = os.path.dirname(image_path)
     self.logger.info("Process {}, ".format(filename, image_path))

@@ -21,12 +21,11 @@ total_start_time = time.time()
 data_dir = pathlib.Path(antichat_config.generated_images_path)
 
 start_time = time.time()
-image_count = len(list(data_dir.glob('*/*.png')))
+image_count = len(list(data_dir.glob('*/*.jpg')))
 print(image_count)
 
-chat = list(data_dir.glob('chat/*'))
-
-pas_chat = list(data_dir.glob('pas_chat/*'))
+cat = list(data_dir.glob(antichat_config.cat_class_name + "/*." + antichat_config.picture_extension))
+no_cat = list(data_dir.glob(antichat_config.no_cat_class_name + "/*." + antichat_config.picture_extension))
 
 batch_size = 32
 
@@ -133,19 +132,22 @@ plt.savefig(os.path.join(antichat_config.website_training_path, "training.png"))
 
 total_time = time.time() - total_start_time
 
-total_picture_count = len(chat) + len(pas_chat)
+total_picture_count = len(cat) + len(no_cat)
 data = {
-  "chat_count": len(chat),
-  "pas_chat_count": len(pas_chat),
-  "traning_count": int(total_picture_count * (1 - antichat_config.validation_split)),
-  "validation_count": int(total_picture_count * antichat_config.validation_split),
+  "picture_count": {
+    antichat_config.cat_class_name: len(cat),
+    antichat_config.no_cat_class_name: len(no_cat),
+    "traning": int(total_picture_count * (1 - antichat_config.validation_split)),
+    "validation": int(total_picture_count * antichat_config.validation_split),
+  },
   "image_size": [ antichat_config.img_width, antichat_config.img_height],
   "training_time": training_time,
   "loading_time": loading_time,
   "total_time": total_time,
   "model_summary": model_summary,
   "processing_time": processing_time,
-  "compiling_time": compiling_time }
+  "compiling_time": compiling_time,
+}
 json_path = os.path.join(antichat_config.website_training_path, "data.json")
 pprint.pprint(json_path)
 pprint.pprint(data)

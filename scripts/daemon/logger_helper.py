@@ -22,7 +22,7 @@ def get_logger(prefix):
       logging.basicConfig(level=logging.DEBUG, format = format_string)
     else:
       script_file = os.path.basename(sys.argv[0])
-      log_file = "/var/log/jet/{}.log".format(os.path.splitext(script_file)[0])
+      log_file = "/var/log/antichat/{}.log".format(os.path.splitext(script_file)[0])
       log_handler = logging.handlers.TimedRotatingFileHandler(log_file, when="D", backupCount=14)
       my_formatter = logging.Formatter(format_string)
       log_handler.setFormatter(my_formatter)

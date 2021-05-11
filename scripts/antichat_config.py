@@ -10,12 +10,21 @@ antichat_dir_path = os.path.dirname(config_dir_path)
 
 img_width = 180
 img_height = 180
-class_names = [ "chat", "pas_chat" ]
+cat_class_name = "chat"
+no_cat_class_name = "pas_chat"
+class_names = [ cat_class_name, no_cat_class_name ]
 validation_split = .1
 model_path = os.path.join(antichat_dir_path, "antichat_model")
 data_path = os.path.join(antichat_dir_path, "data")
 generated_images_path = os.path.join(data_path, "generated")
-extra_images_path = os.path.join(data_path, "extra_pics")
+classified_images_path = os.path.join(data_path, "classified")
+picture_extension = "jpg"
+
+# Notification
+cat_detection_threshold = .75
+cat_notification_delay = 60 * 2
+cat_notification_limit_count = 6
+cat_notification_limit_decount_period = 60 * 5
 
 log_path = "/var/log/antichat"
 
@@ -33,7 +42,7 @@ if __name__ == "__main__":
   path_to_test = {
     "model_path": model_path,
     "generated_images_path": generated_images_path,
-    "extra_images_path": extra_images_path,
+    "classified_images_path": classified_images_path,
     "data_path": data_path,
     "ftp_snap_path": ftp_snap_path,
     "keep_video_path": keep_video_path,

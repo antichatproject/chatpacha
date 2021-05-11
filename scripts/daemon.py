@@ -20,6 +20,7 @@ import directory_evaluater
 import file_mover
 import logger_helper
 import model
+import mqtt
 
 class Deamon:
   def __init__(self, loop = None):
@@ -28,12 +29,15 @@ class Deamon:
     self.model =  model.Model()
     self.incoming_file_mover = file_mover.FileMover(antichat_config.ftp_snap_path, antichat_config.website_incoming_path)
     self.incoming_directory_evaluater = directory_evaluater.DirectoryEvaluater(self.model, antichat_config.website_incoming_path)
+    self.incoming_directory_evaluater.on_new_picture = self.on_new_picture
     self.test_directory_evaluater = directory_evaluater.DirectoryEvaluater(self.model, antichat_config.website_test_path)
+    self.mqtt = mqtt.MQTT()
 
   async def run(self):
     self.loop.create_task(self.incoming_directory_evaluater.run())
     self.loop.create_task(self.test_directory_evaluater.run())
     self.loop.create_task(self.incoming_file_mover.run())
+    self.loop.create_task(self.mqtt.run())
     self.loop.create_task(self.get_feedback())
 
   async def get_feedback(self):
@@ -64,7 +68,7 @@ class Deamon:
     self.logger.info(image_json)
     self.logger.info(action)
     if action in antichat_config.class_names:
-      destination_path = os.path.join(antichat_config.extra_images_path, action)
+      destination_path = os.path.join(antichat_config.classified_images_path, action)
       if os.path.exists(os.path.join(destination_path, image_json["file"])):
         os.remove(image_path)
       else:
@@ -76,6 +80,13 @@ class Deamon:
     if action is not None:
       os.remove(action_path)
     os.remove(thumbnail_path)
+
+  def on_new_picture(self, image_path, data):
+    try:
+      if data["class"] == antichat_config.cat_class_name and data["score"] > antichat_config.cat_detection_threshold:
+        self.mqtt.cat_detected()
+    except:
+      self.logger.exception("Send cat mqtt fail")
 
 if __name__ == "__main__":
   loop = asyncio.get_event_loop()

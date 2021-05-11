@@ -34,7 +34,7 @@ class Model:
     img_array = tf.expand_dims(img_array, 0) # Create a batch
     predictions = self.model.predict(img_array)
     score = tf.nn.softmax(predictions[0])
-    result = (self.class_names[np.argmax(score)], 100 * np.max(score))
+    result = (self.class_names[np.argmax(score)], float(np.max(score)))
     self.logger.info("{} {} {}".format(image_path, result[0], int(result[1])))
     return result
 

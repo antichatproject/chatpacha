@@ -52,17 +52,14 @@
   </head>
   <body>
 <?php
-  $classes = array(
-      "pas_chat" => array("name" => "Pas chat", "color" => "black", "icon" => "✅"),
-      "chat" => array("name" => "Chat", "color" => "red", "icon" => "🐈"),
-  );
+  require "tools.php";
 
   function printIcon($class_id, $file_json, $classes) {
     print("<span id='".$file_json["name"]."-icon-".$class_id."' class='class-icon ");
     if ($file_json["class"] == $class_id) {
       print("training-result ");
     }
-    if ($_SERVER['PHP_AUTH_USER'] == "antichat") {
+    if (isAdmin()) {
       if (array_key_exists("action", $file_json) && $file_json["action"] == $class_id) {
         print("selected");
       }
@@ -81,30 +78,30 @@
     if ($file_json["class"] == $class_ids[0]) {
       $score0 = $file_json["score"];
     } else {
-      $score0 = 100 - $file_json["score"];
+      $score0 = 1 - $file_json["score"];
     }
-    $score1 = 100 - $score0;
-    print("<span class='progress-bar-inside' style='width: ".$score0."%'>&nbsp;");
+    $score1 = 1 - $score0;
+    print("<span class='progress-bar-inside' style='width: ".($score0 * 100)."%'>&nbsp;");
     if ($file_json["class"] == $class_ids[0]) {
-      print("<span class='score0'>".intval($score0)."%</span>");
+      print("<span class='score0'>".intval($score0 * 100)."%</span>");
     }
     print("</span>");
     if ($file_json["class"] == $class_ids[1]) {
-      print("<span class='score1'>".intval($score1)."%</span>");
+      print("<span class='score1'>".intval($score1 * 100)."%</span>");
     }
     print("</span> ");
     printIcon($class_ids[1], $file_json, $classes);
     print("</div>");
   }
 
-  function printAllImages($all_json, $classes) {
+  function printAllImages($all_json, $classes, $day_category) {
     $class_ids = array_keys($classes);
     $previous_day = "";
     foreach ($all_json as $key => $file_json) {
       $date = new DateTime();
       $date->setTimestamp($file_json["timestamp"]);
       $day = $date->format('d/m/Y');
-      if ($previous_day != $day) {
+      if ($day_category && $previous_day != $day) {
         print("<hr/>");
         $previous_day = $day;
         print("<div class='date-info'>".$day."</div>");
@@ -128,9 +125,27 @@
   function compare_json($a, $b) {
     return strcmp($b["timestamp"], $a["timestamp"]);
   }
+  
+  function compare_score($a, $b) {
+    if ($a == $b) {
+        return 0;
+    }
+    return ($a < $b) ? -1 : 1;
+  }
+  
+  function build_json_soter($sort_class) {
+    return function ($a, $b) use($sort_class) {
+      if ($sort_class == "chat") {
+        return compare_score($a["score"], $b["score"]);
+      } elseif ($sort_class == "pas_chat") {
+        return compare_score($a["score"], $b["score"]);
+      } else {
+        return strcmp($b["timestamp"], $a["timestamp"]);
+      }
+    };
+  }
 
   function load_all_json($classes, $dir) {
-    $cdir = scandir($dir);
     $all_json = array();
     if (array_key_exists("class", $_GET)) {
       $class_filter = $_GET["class"];
@@ -138,6 +153,7 @@
       $class_filter = "";
     }
     $class_counter = array("total" => 0);
+    $cdir = scandir($dir);
     foreach ($cdir as $key => $filename) {
       if (pathinfo($filename, PATHINFO_EXTENSION) == "json") {
         $string = file_get_contents($dir.$filename);
@@ -162,10 +178,20 @@
         array_push($all_json, $json);
       }
     }
-    usort($all_json, "compare_json");
+    if (array_key_exists("class", $_GET)) {
+      usort($all_json, build_json_soter($_GET["class"]));
+    } else {
+    usort($all_json, build_json_soter(""));
+    }
+    usort($all_json, build_json_soter($_GET["class"]));
     return [$class_counter, $all_json];
   }
-  [$class_counter, $all_json] = load_all_json($classes, "images/incoming/");
+  if (array_key_exists("tests", $_GET)) {
+    $dir = "images/tests/";
+  } else {
+    $dir = "images/incoming/";
+  }
+  [$class_counter, $all_json] = load_all_json($classes, $dir);
 ?>
     <script>
       var actions = {
@@ -210,7 +236,7 @@
   print(count($all_json));
   print("</span>");
   print("</div>");
-  printAllImages($all_json, $classes);
+  printAllImages($all_json, $classes, !array_key_exists("class", $_GET));
 ?>
   </body>
 </html>

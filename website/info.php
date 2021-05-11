@@ -8,16 +8,16 @@
     <br/>
     <table>
       <tr>
-        <td>Chat</td><td><?php print($json["chat_count"]); ?></td>
+        <td>Chat&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["chat"]); ?></span></td>
       </tr>
       <tr>
-        <td>Pas chat</td><td><?php print($json["pas_chat_count"]); ?></td>
+        <td>Pas chat&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["pas_chat"]); ?></span></td>
       </tr>
       <tr>
-        <td>Total</td><td><?php print($json["pas_chat_count"] + $json["chat_count"]); ?></td>
+        <td>Total&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["pas_chat"] + $json["picture_count"]["chat"]); ?></span></td>
       </tr>
       <tr>
-        <td>Image size</td><td><?php print($json["image_size"][0]."x".$json["image_size"][1]); ?></td>
+        <td>Image size&nbsp;</td><td style="text-align:right"><?php print($json["image_size"][0]."x".$json["image_size"][1]); ?></td>
       </tr>
     </table>
     <hr/>
@@ -25,25 +25,25 @@
     <br/>
     <table>
       <tr>
-        <td>Training images</td><td><?php print($json["traning_count"]); ?></td>
+        <td>Training images&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["traning"]); ?></span></td>
       </tr>
       <tr>
-        <td>Validation images</td><td><?php print($json["validation_count"]); ?></td>
+        <td>Validation images&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["validation"]); ?></span></td>
       </tr>
       <tr>
-        <td>Total</td><td><?php print(gmdate("H\\h i\\m s\\s", intval($json["total_time"]))); ?></td>
+        <td>Total&nbsp;</td><td style="text-align:right"><?php print(gmdate("H\\h i\\m s\\s", intval($json["total_time"]))); ?></td>
       </tr>
       <tr>
-        <td>Loading</td><td><?php print(gmdate("H\\h i\\m s\\s", intval($json["loading_time"]))); ?></td>
+        <td>Loading&nbsp;</td><td style="text-align:right"><?php print(gmdate("H\\h i\\m s\\s", intval($json["loading_time"]))); ?></td>
       </tr>
       <tr>
-        <td>Processing</td><td><?php print(gmdate("H\\h i\\m s\\s", intval($json["processing_time"]))); ?></td>
+        <td>Processing&nbsp;</td><td style="text-align:right"><?php print(gmdate("H\\h i\\m s\\s", intval($json["processing_time"]))); ?></td>
       </tr>
       <tr>
-        <td>Compiling</td><td><?php print(gmdate("H\\h i\\m s\\s", intval($json["compiling_time"]))); ?></td>
+        <td>Compiling&nbsp;</td><td style="text-align:right"><?php print(gmdate("H\\h i\\m s\\s", intval($json["compiling_time"]))); ?></td>
       </tr>
       <tr>
-        <td>Training</td><td><?php print(gmdate("H\\h i\\m s\\s", intval($json["training_time"]))); ?></td>
+        <td>Training&nbsp;</td><td style="text-align:right"><?php print(gmdate("H\\h i\\m s\\s", intval($json["training_time"]))); ?></td>
       </tr>
     </table>
     <br/>
@@ -51,5 +51,11 @@
       <?php print(nl2br($json["model_summary"])); ?>
     </code>
     <img src="training/training.png" />
+<script>
+var array = document.getElementsByClassName("local-number");
+for (element of array) {
+  element.innerHTML = parseFloat(element.innerHTML).toLocaleString();
+}
+</script>
   </body>
 </html>
