@@ -24,9 +24,6 @@ start_time = time.time()
 image_count = len(list(data_dir.glob('*/*.jpg')))
 print(image_count)
 
-cat = list(data_dir.glob(antichat_config.cat_class_name + "/*." + antichat_config.picture_extension))
-no_cat = list(data_dir.glob(antichat_config.no_cat_class_name + "/*." + antichat_config.picture_extension))
-
 batch_size = 32
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
@@ -132,11 +129,15 @@ plt.savefig(os.path.join(antichat_config.website_training_path, "training.png"))
 
 total_time = time.time() - total_start_time
 
-total_picture_count = len(cat) + len(no_cat)
+dataset_cat = list(data_dir.glob(antichat_config.cat_class_name + "/*." + antichat_config.picture_extension))
+dataset_no_cat = list(data_dir.glob(antichat_config.no_cat_class_name + "/*." + antichat_config.picture_extension))
+total_picture_count = len(dataset_cat) + len(dataset_no_cat)
 data = {
   "picture_count": {
-    antichat_config.cat_class_name: len(cat),
-    antichat_config.no_cat_class_name: len(no_cat),
+    "dataset": {
+      antichat_config.cat_class_name: len(dataset_cat),
+      antichat_config.no_cat_class_name: len(dataset_no_cat),
+    },
     "traning": int(total_picture_count * (1 - antichat_config.validation_split)),
     "validation": int(total_picture_count * antichat_config.validation_split),
   },
