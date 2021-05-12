@@ -54,12 +54,12 @@
 <?php
   require "tools.php";
 
-  function printIcon($class_id, $file_json, $classes) {
+  function printIcon($class_id, $file_json, $page) {
     print("<span id='".$file_json["name"]."-icon-".$class_id."' class='class-icon ");
     if ($file_json["class"] == $class_id) {
       print("training-result ");
     }
-    if (isAdmin()) {
+    if ($page->isAdmin()) {
       if (array_key_exists("action", $file_json) && $file_json["action"] == $class_id) {
         print("selected");
       }
@@ -68,12 +68,12 @@
     } else {
       print("'");
     }
-    print(">".$classes[$class_id]["icon"]."</span> ");
+    print(">".$page->getClasses()[$class_id]["icon"]."</span> ");
   }
 
-  function printProgressBar($file_json, $classes, $class_ids) {
+  function printProgressBar($file_json, $class_ids, $page) {
     print("<div>");
-    printIcon($class_ids[0], $file_json, $classes);
+    printIcon($class_ids[0], $file_json, $page);
     print("<span class='progress-bar-outside'>");
     if ($file_json["class"] == $class_ids[0]) {
       $score0 = $file_json["score"];
@@ -90,14 +90,14 @@
       print("<span class='score1'>".intval($score1 * 100)."%</span>");
     }
     print("</span> ");
-    printIcon($class_ids[1], $file_json, $classes);
+    printIcon($class_ids[1], $file_json, $page);
     print("</div>");
   }
 
-  function printAllImages($all_json, $classes, $day_category) {
-    $class_ids = array_keys($classes);
+  function printAllImages($day_category, $page) {
+    $class_ids = array_keys($page->getClasses());
     $previous_day = "";
-    foreach ($all_json as $key => $file_json) {
+    foreach ($page->getIncomingImageJSON() as $key => $file_json) {
       $date = new DateTime();
       $date->setTimestamp($file_json["timestamp"]);
       $day = $date->format('d/m/Y');
@@ -106,7 +106,7 @@
         $previous_day = $day;
         print("<div class='date-info'>".$day."</div>");
       }
-      $class = $classes[$file_json["class"]];
+      $class = $page->getClasses()[$file_json["class"]];
       print("<table border='0' style='display: inline-table'><tr><td colspan='2'>");
       print("<a href='".$file_json["image_path"]."'>");
       print("<img src='".$file_json["thumbnail_path"]."'/>");
@@ -116,7 +116,7 @@
         print("<td>");
         print("<b>".$date->format('H:i:s')."</b>");
         print("</td><td>");
-        printProgressBar($file_json, $classes, $class_ids);
+        printProgressBar($file_json, $class_ids, $page);
         print("</td>");
       print("</table>\n");
     }
@@ -125,78 +125,11 @@
   function compare_json($a, $b) {
     return strcmp($b["timestamp"], $a["timestamp"]);
   }
-  
-  function compare_score($a, $b) {
-    if ($a == $b) {
-        return 0;
-    }
-    return ($a < $b) ? -1 : 1;
-  }
-  
-  function build_json_soter($sort_class) {
-    return function ($a, $b) use($sort_class) {
-      if ($sort_class == "chat") {
-        return compare_score($a["score"], $b["score"]);
-      } elseif ($sort_class == "pas_chat") {
-        return compare_score($a["score"], $b["score"]);
-      } else {
-        return strcmp($b["timestamp"], $a["timestamp"]);
-      }
-    };
-  }
-
-  function load_all_json($classes, $dir) {
-    $all_json = array();
-    if (array_key_exists("class", $_GET)) {
-      $class_filter = $_GET["class"];
-    } else {
-      $class_filter = "";
-    }
-    $class_counter = array("total" => 0);
-    $cdir = scandir($dir);
-    foreach ($cdir as $key => $filename) {
-      if (pathinfo($filename, PATHINFO_EXTENSION) == "json") {
-        $string = file_get_contents($dir.$filename);
-        $json = json_decode($string, true);
-        $class = $json["class"];
-        if (!array_key_exists($class, $class_counter)) {
-          $class_counter[$class] = 0;
-        }
-        $class_counter[$class] = $class_counter[$class] + 1;
-        $class_counter["total"] = $class_counter["total"] + 1;
-        if ($class_filter != "" && $class != $class_filter) {
-          continue;
-        }
-        $json["image_path"] = $dir.$json["file"];
-        $json["thumbnail_path"] = $dir.$json["thumbnail"];
-        if (file_exists($dir.$json["name"].".action")) {
-          $action = file_get_contents($dir.$json["name"].".action");
-          if (array_key_exists($action, $classes)) {
-            $json["action"] = $action;
-          }
-        }
-        array_push($all_json, $json);
-      }
-    }
-    if (array_key_exists("class", $_GET)) {
-      usort($all_json, build_json_soter($_GET["class"]));
-    } else {
-    usort($all_json, build_json_soter(""));
-    }
-    usort($all_json, build_json_soter($_GET["class"]));
-    return [$class_counter, $all_json];
-  }
-  if (array_key_exists("tests", $_GET)) {
-    $dir = "images/tests/";
-  } else {
-    $dir = "images/incoming/";
-  }
-  [$class_counter, $all_json] = load_all_json($classes, $dir);
 ?>
     <script>
       var actions = {
 <?php
-  foreach ($all_json as $_ => $json) {
+  foreach ($page->getIncomingImageJSON() as $_ => $json) {
     if (array_key_exists("action", $json)) {
       print("'".$json["name"]."': '".$json["action"]."',\n");
     }
@@ -225,18 +158,13 @@
       }
     </script>
 <?php
-  print("<div>");
-  print("<a href='index.php'>All ".$class_counter["total"]."</a> | ");
-  print("<a href='index.php?class=chat'>Chat ".$class_counter["chat"]."</a> | ");
-  print("<a href='index.php?class=pas_chat'>Pas chat ".$class_counter["pas_chat"]."</a> | ");
-  print("<a href='info.php'>Info</a>");
-  print("</div><br/>");
+  print(mainMenu($page));
   print("<div>");
   print("<span id='antichat-info'>Images: ");
-  print(count($all_json));
+  print(count($page->getIncomingImageJSON()));
   print("</span>");
   print("</div>");
-  printAllImages($all_json, $classes, !array_key_exists("class", $_GET));
+  printAllImages(!array_key_exists("class", $_GET), $page);
 ?>
   </body>
 </html>

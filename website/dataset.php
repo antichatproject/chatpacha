@@ -5,6 +5,8 @@
 <?php
   require "tools.php";
 
+  print(mainMenu($page));
+
   $page_offset = 0;
   if (array_key_exists("offset", $_GET)) {
     $page_offset = $_GET["offset"];
@@ -14,8 +16,8 @@
   } else {
     $class = "";
   }
-  if (!array_key_exists($class, $classes)) {
-    $class = array_keys($classes)[1];
+  if (!array_key_exists($class, $page->getClasses())) {
+    $class = array_keys($page->getClasses())[1];
   }
   $page_count = 100;
   $pictures = array();
@@ -46,7 +48,7 @@
     array_push($page_links, $string);
   }
   print(implode(" | ", $page_links));
-  print("</div>");
+  print("</div><br/>");
   foreach ($pictures as $_ => $filename) {
     print("<a href='images/generated/".$class."/".$filename."'><img src='images/generated/".$class."/thumbnails/".$filename."' /></a>\n");
   }

@@ -1,20 +1,22 @@
 <html>
   <body>
 <?php
-  $string = file_get_contents("training/data.json");
-  $json = json_decode($string, true);
+  require "tools.php";
+
+  print(mainMenu($page));
+  $json = $page->getTrainingInfo();
 ?>
     <div><b>Data set</b></div>
     <br/>
     <table>
       <tr>
-        <td>Chat&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["chat"]); ?></span></td>
+        <td><?php print($page->getClassName("chat")); ?>&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($page->getTrainingClassPictureCount("chat")); ?></span></td>
       </tr>
       <tr>
-        <td>Pas chat&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["pas_chat"]); ?></span></td>
+        <td><?php print($page->getClassName("pas_chat")); ?>&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($page->getTrainingClassPictureCount("pas_chat")); ?></span></td>
       </tr>
       <tr>
-        <td>Total&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["pas_chat"] + $json["picture_count"]["chat"]); ?></span></td>
+        <td>Total&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($page->getTrainingClassPictureCount("pas_chat") + $page->getTrainingClassPictureCount("chat")); ?></span></td>
       </tr>
       <tr>
         <td>Image size&nbsp;</td><td style="text-align:right"><?php print($json["image_size"][0]."x".$json["image_size"][1]); ?></td>
