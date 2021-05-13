@@ -31,6 +31,8 @@ def get_logger(prefix):
     if script_file != "daemon.py" or debug_mode:
       logging.basicConfig(level=level, format = format_string)
     else:
+      if not os.path.isdir(antichat_config.log_path):
+        os.mkdir(antichat_config.log_path)
       log_file = os.path.join(antichat_config.log_path, "{}.log".format(os.path.splitext(script_file)[0]))
       log_handler = logging.handlers.TimedRotatingFileHandler(log_file, when="D", backupCount=14)
       my_formatter = logging.Formatter(format_string)
