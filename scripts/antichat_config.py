@@ -29,7 +29,6 @@ cat_notification_limit_decount_period = 60 * 5
 log_path = "/var/log/antichat"
 
 ftp_snap_path = os.path.normpath(os.path.join(antichat_dir_path, "..", "cam", "FI9900P_00626E6778C6", "snap"))
-keep_video_path = os.path.normpath(os.path.join(antichat_dir_path, "..", "cam", "FI9900P_00626E6778C6", "record", "keep"))
 
 website_path = os.path.join(antichat_dir_path, "website")
 website_images_path = os.path.join(website_path, "images")
