@@ -1,32 +1,30 @@
 #!/usr/bin/env python3
-# test_images.py <dir>
+# test_images.py <dir> or <test.jpg>
 
-#import matplotlib.pyplot as plt
-import numpy as np
+import logging
 import os
-import PIL
-import tensorflow as tf
 import pathlib
 import pprint
 import sys
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
+
+sys.path.append(os.path.join(os.path.dirname(sys.argv[0]), "daemon"))
 
 import antichat_config
+import logger_helper
+import model
 
-def test_image(model, image_path, img_width, img_height, class_names):
-  img = keras.preprocessing.image.load_img(image_path, target_size=(img_height, img_width))
-  img_array = keras.preprocessing.image.img_to_array(img)
-  img_array = tf.expand_dims(img_array, 0) # Create a batch
-  predictions = model.predict(img_array)
-  score = tf.nn.softmax(predictions[0])
-  #print("This image most likely belongs to {} with a {:.2f} percent confidence.".format(class_names[np.argmax(score)], 100 * np.max(score)))
-  return (class_names[np.argmax(score)], 100 * np.max(score))
+def test_file(test_path, model):
+  class_name, score = model.evaluate(test_path)
+  pprint.pprint([class_name, int(score * 100), os.path.basename(test_path)])
 
-model = tf.keras.models.load_model(antichat_config.model_path)
-test_dir = pathlib.Path(sys.argv[1])
-chat_test = sorted(list(test_dir.glob('*.jpg')))
-for image_path in chat_test:
-  class_name, score = test_image(model, image_path, antichat_config.img_width, antichat_config.img_height, antichat_config.class_names)
-  pprint.pprint([class_name, int(score), os.path.basename(image_path)])
+logger_helper.default_level = logging.WARNING
+model = model.Model()
+test_path = pathlib.Path(sys.argv[1])
+if os.path.isdir(test_path):
+  chat_test = sorted(list(test_path.glob('*.jpg')))
+  for image_path in chat_test:
+    if os.path.splitext(image_path)[0].endswith("_thub"):
+      continue
+    test_file(image_path, model)
+elif os.path.isfile(test_path):
+  test_file(test_path, model)
