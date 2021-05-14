@@ -1,6 +1,7 @@
 # Goal
 
-The goal of this project is to avoid cats to poop in the garden. To do so, a camera is used to detect cats, and turn on the sprinkler quickly. This project is based on TensorFlow, and the training is described in this example [classification](https://www.tensorflow.org/tutorials/images/classification).
+The goal of this project is to avoid cats to poop in the garden. A python script uses TensorFlow to detect cats from the IP camera pictures. Once the cat detected the sprinkler is turned on quickly.
+This project is based this TensorFlow [classification example](https://www.tensorflow.org/tutorials/images/classification).
 
 # Hardware
 
