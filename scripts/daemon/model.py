@@ -35,7 +35,7 @@ class Model:
     predictions = self.model.predict(img_array)
     score = tf.nn.softmax(predictions[0])
     result = (self.class_names[np.argmax(score)], float(np.max(score)))
-    self.logger.info("{} {} {}".format(image_path, result[0], int(result[1])))
+    self.logger.info("{} {} {}".format(image_path, result[0], int(result[1] * 100)))
     return result
 
 if __name__ == "__main__":
