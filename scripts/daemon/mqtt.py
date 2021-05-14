@@ -86,7 +86,11 @@ class MQTT:
     try:
       if not self.enabled:
         return
-      if (self.last_cat_notification is None or (time.time() - self.last_cat_notification > antichat_config.cat_notification_delay)) and self.cat_notification_counter < antichat_config.cat_notification_limit_count:
+      if self.last_cat_notification is not None and (time.time() - self.last_cat_notification < 2):
+        # Still the same cat if it happens in less than 2s from the previous notification.
+        self.logger.info("Still cat {} {}".format(self.cat_notification_counter, self.last_cat_notification))
+        self.last_cat_notification = time.time()
+      elif (self.last_cat_notification is None or (time.time() - self.last_cat_notification > antichat_config.cat_notification_delay)) and self.cat_notification_counter < antichat_config.cat_notification_limit_count:
         self.logger.info("Send cat notification {}".format(self.cat_notification_counter))
         self.last_cat_notification = time.time()
         self.client.publish(CAT_DETECTED_TOPIC, str(time.time()), qos = 1)
