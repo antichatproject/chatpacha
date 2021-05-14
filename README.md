@@ -4,8 +4,14 @@ The goal of this project is to avoid cats to poop in the garden. To do so, a cam
 
 # Hardware
 
-The hardware used is a regular computer for a ftp server and to run TensorFlow, an IP camera (I use Foscam FI9900P), a Raspberry Pi to trigger the sprinkler (an WiFi arduino can be used) and a solenoid valve (I used a random motion activated sprinkler that I dissambled for the solenoid valve).
-The solenoid valve is drived by a relay plugged to the Raspberry Pi.
+- Regular PC with python3, ftp server, webserver, php
+The hardware used is a regular computer for a ftp server, webserver, python3 and to run TensorFlow.
+- IP camera
+The IP camera needs to upload pictures to the FTP server when a motion is detected.
+- Solenoid valve
+I bought a random motion activated sprinkler that I dissambled for the solenoid valve.
+- Raspberry pi (or Wifi arduino)
+The solenoid valve is driven by the Raspberry Pi using a relay.
 
 # Software
 
@@ -16,5 +22,7 @@ The IP camera is setup to upload pictures to the computer ftp server, as soon as
 ## daemon.py
 
 `scripts/daemon.py` is in charge to pick-up the newly uploaded pictures, to move them into `website/images/incoming` directory, and the daemon evaluates each picture. The result of the evaluation is saved into `website/images/incoming/image_name.json` (for `image_name.jpg`).
+
+## MQTT
 
 ## website
