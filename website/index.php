@@ -121,10 +121,6 @@
       print("</table>\n");
     }
   }
-
-  function compare_json($a, $b) {
-    return strcmp($b["timestamp"], $a["timestamp"]);
-  }
 ?>
     <script>
       var actions = {
