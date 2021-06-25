@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -148,6 +149,7 @@ data = {
   "model_summary": model_summary,
   "processing_time": processing_time,
   "compiling_time": compiling_time,
+  "timestamp": datetime.datetime.now().timestamp(),
 }
 json_path = os.path.join(antichat_config.website_training_path, "data.json")
 pprint.pprint(json_path)
