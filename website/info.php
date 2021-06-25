@@ -27,6 +27,9 @@
     <br/>
     <table>
       <tr>
+        <td>Last update&nbsp;</td><td style="text-align:right"><?php print(date("j/m/Y G:i:s", $json["timestamp"])); ?></td>
+      </tr>
+      <tr>
         <td>Training images&nbsp;</td><td style="text-align:right"><span class="local-number"><?php print($json["picture_count"]["traning"]); ?></span></td>
       </tr>
       <tr>
