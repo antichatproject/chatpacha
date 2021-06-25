@@ -16,6 +16,12 @@ The solenoid valve is driven by the Raspberry Pi using a relay.
 
 # Software
 
+`pip3 install matplotlib`
+`pip3 install numpy`
+`apt install libatlas-base-dev`
+`apt install libopenjp2-7`
+`apt install ffmpeg`
+
 ## FTP server
 
 The IP camera is setup to upload pictures to the computer ftp server, as soon as a motion is detected.
