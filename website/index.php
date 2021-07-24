@@ -109,7 +109,7 @@
       $class = $page->getClasses()[$file_json["class"]];
       print("<table border='0' style='display: inline-table'><tr><td colspan='2'>");
       print("<a href='".$file_json["image_path"]."'>");
-      print("<img src='".$file_json["thumbnail_path"]."'/>");
+      print("<img src='".$file_json["thumbnail_path"]."' width='320' height='180'/>");
       print("</a>");
       print("</td></tr>");
       print("<tr>");
