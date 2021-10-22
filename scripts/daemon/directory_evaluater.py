@@ -50,13 +50,14 @@ class DirectoryEvaluater:
     all_file_paths = list(snap_dir.glob('*'))
     for image_path in all_file_paths:
       if self.should_process_image(image_path):
-        self.loop.create_task(self.process_image(image_path, False))
+        self.loop.create_task(self.process_image(image_path, datetime.datetime.now().timestamp(), False))
     while True:
       event = await self.watcher.get_event()
+      self.logger.debug(pprint.pformat(event))
       name, extension = os.path.splitext(event.name)
       image_path = os.path.join(self.path, event.name)
       if self.should_process_image(image_path):
-        self.loop.create_task(self.process_image(image_path, True))
+        self.loop.create_task(self.process_image(image_path, datetime.datetime.now().timestamp(), True))
     self.watcher.close()
 
   def get_timestamp(self, image_name, image_path):
@@ -73,26 +74,31 @@ class DirectoryEvaluater:
   def load_thubnail(self, image_path):
     return keras.preprocessing.image.load_img(image_path, target_size=(self.thub_height, self.thub_width))
 
-  async def process_image(self, image_path, send_notification = False):
-    await asyncio.sleep(2)
-    filename = os.path.basename(image_path)
-    path = os.path.dirname(image_path)
-    self.logger.info("Process {}, ".format(filename, image_path))
-    image_name, image_ext = os.path.splitext(filename)
-    if not os.path.exists(image_path):
-      self.logger.error("File doesn't exist {}".format(image_path))
-    thumbnail_name = image_name + self.thumbnail_suffix + image_ext
-    thubnail = self.load_thubnail(image_path)
-    result = self.model.evaluate(image_path)
-    json_path = os.path.join(path, image_name + ".json")
-    data = { "name": image_name, "file": filename, "class": result[0], "score": result[1], "thumbnail": thumbnail_name, "timestamp": self.get_timestamp(image_name, image_path) }
-    with open(json_path, "w") as output:
-      json.dump(data, output)
-    thumbnail_path = os.path.join(path, thumbnail_name)
-    keras.preprocessing.image.save_img(thumbnail_path, thubnail)
-    self.logger.info("  Done processing {}".format(filename))
-    if send_notification and self.on_new_picture:
-      self.on_new_picture(image_path, data)
+  async def process_image(self, image_path, receive_timestamp, send_notification = False):
+    try:
+      filename = os.path.basename(image_path)
+      path = os.path.dirname(image_path)
+      self.logger.info("Process {}, ".format(filename, image_path))
+      image_name, image_ext = os.path.splitext(filename)
+      if not os.path.exists(image_path):
+        self.logger.error("File doesn't exist {}".format(image_path))
+        return
+      thumbnail_name = image_name + self.thumbnail_suffix + image_ext
+      thubnail = self.load_thubnail(image_path)
+      result = self.model.evaluate(image_path)
+      json_path = os.path.join(path, image_name + ".json")
+      thumbnail_path = os.path.join(path, thumbnail_name)
+      keras.preprocessing.image.save_img(thumbnail_path, thubnail)
+      now_timestamp = datetime.datetime.now().timestamp()
+      creation_image_timestamp = self.get_timestamp(image_name, image_path)
+      data = { "name": image_name, "file": filename, "class": result[0], "score": result[1], "thumbnail": thumbnail_name, "timestamp": creation_image_timestamp, "ai_duration": now_timestamp - receive_timestamp, "latency": now_timestamp - creation_image_timestamp }
+      with open(json_path, "w") as output:
+        json.dump(data, output)
+      if send_notification and self.on_new_picture:
+        self.on_new_picture(image_path, data)
+      self.logger.info("  Done processing {}, ai_duration {}, latency {}".format(filename, now_timestamp - receive_timestamp, now_timestamp - creation_image_timestamp))
+    except:
+      self.logger.exception("Exception with {}".format(image_path))
 
 if __name__ == "__main__":
   model = model.Model()
