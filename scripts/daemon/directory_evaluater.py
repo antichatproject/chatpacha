@@ -32,7 +32,7 @@ class DirectoryEvaluater:
     self.thub_width = 320
     self.thub_height = 180
     self.watcher = aionotify.Watcher()
-    self.watcher.watch(path = self.path, flags = aionotify.Flags.MOVED_TO | aionotify.Flags.CREATE)
+    self.watcher.watch(path = self.path, flags = aionotify.Flags.MOVED_TO | aionotify.Flags.CLOSE_WRITE)
     self.thumbnail_suffix = "_thub"
     self.valid_extensions = [ ".jpg" ]
     self.on_new_picture = None
