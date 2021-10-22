@@ -51,10 +51,14 @@ class Deamon:
       for json_name in list(website_path.glob('*.json')):
         json_path = os.path.join(antichat_config.website_incoming_path, json_name)
         with open(json_path, "r") as f:
-            image_json = json.load(f)
-            if flush_image or time.time() - image_json["timestamp"] > 60 * 60 *24:
-              self.logger.info("{} {}".format(json_path, time.time() - image_json["timestamp"]))
-              self.remove_incoming_image(json_path, image_json)
+            try:
+              image_json = json.load(f)
+              if flush_image or time.time() - image_json["timestamp"] > 60 * 60 * 24:
+                self.logger.info("{} {}".format(json_path, time.time() - image_json["timestamp"]))
+                self.remove_incoming_image(json_path, image_json)
+            except:
+              os.remove(json_path)
+              self.logger.exception("Fail to load {}".format(json_path))
       await asyncio.sleep(60 * 5)
 
   def remove_incoming_image(self, json_path, image_json):
