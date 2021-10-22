@@ -33,7 +33,9 @@ class FileMover:
       self.loop.create_task(self.process_file(file_path))
     while True:
       event = await self.watcher.get_event()
+      self.logger.debug("Event {}".format(pprint.pformat(event)))
       file_path = os.path.join(self.origin_path, event.name)
+      self.logger.debug("Start task for {}".format(file_path))
       self.loop.create_task(self.process_file(file_path))
     self.watcher.close()
 
