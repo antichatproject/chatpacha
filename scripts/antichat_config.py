@@ -21,7 +21,7 @@ classified_images_path = os.path.join(data_path, "classified")
 picture_extension = "jpg"
 
 # Notification
-cat_detection_threshold = .75
+cat_detection_threshold = .80
 cat_notification_delay = 60 * 2
 cat_notification_limit_count = 6
 cat_notification_limit_decount_period = 60 * 5
