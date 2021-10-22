@@ -126,13 +126,33 @@
     }
   }
 
+  function addParameterToLink($url, $parameters) {
+    $addAndSign = true;
+    if (strpos($url, "?") === false) {
+      $url = $url."?";
+      $addAndSign = false;
+    }
+    foreach ($parameters as $parameter) {
+      if ($addAndSign) {
+        $url = $url."&";
+      }
+      $url = $url.$parameter;
+    }
+    return $url;
+  }
+
   function incomingSubmenu($page) {
+    if (array_key_exists("tests", $_GET)) {
+      $parameters = Array("tests");
+    } else {
+      $parameters = Array();
+    }
     $sub_menu = "<div>";
-    $sub_menu = $sub_menu.menuWithLink("All ".$page->getIncomingClassifiedCount("total"), "index.php", $page->isClassSelected(""));
+    $sub_menu = $sub_menu.menuWithLink("All ".$page->getIncomingClassifiedCount("total"), addParameterToLink("index.php", $parameters), $page->isClassSelected(""));
     $sub_menu = $sub_menu." | ";
-    $sub_menu = $sub_menu.menuWithLink($page->getClassName("chat")." ".$page->getIncomingClassifiedCount("chat"), "index.php?class=chat", $page->isClassSelected("chat"));
+    $sub_menu = $sub_menu.menuWithLink($page->getClassName("chat")." ".$page->getIncomingClassifiedCount("chat"), addParameterToLink("index.php?class=chat", $parameters), $page->isClassSelected("chat"));
     $sub_menu = $sub_menu." | ";
-    $sub_menu = $sub_menu.menuWithLink($page->getClassName("pas_chat")." ".$page->getIncomingClassifiedCount("pas_chat"), "index.php?class=pas_chat", $page->isClassSelected("pas_chat"));
+    $sub_menu = $sub_menu.menuWithLink($page->getClassName("pas_chat")." ".$page->getIncomingClassifiedCount("pas_chat"), addParameterToLink("index.php?class=pas_chat", $parameters), $page->isClassSelected("pas_chat"));
     $sub_menu = $sub_menu."</div>";
     return $sub_menu;
   }
@@ -149,8 +169,15 @@
   function mainMenu($page) {
     $result = "<div><b>";
     $sub_menu = "";
-    $result = $result.menuWithLink("Incoming", "index.php", $page->isURL("index"));
-    if ($page->isURL("index")) {
+    $isOnPage = $page->isURL("index") && !array_key_exists("tests", $_GET);
+    $result = $result.menuWithLink("Incoming", "index.php", $isOnPage);
+    if ($isOnPage) {
+      $sub_menu = incomingSubmenu($page);
+    }
+    $result = $result." | ";
+    $isOnPage = $page->isURL("index") && array_key_exists("tests", $_GET);
+    $result = $result.menuWithLink("Tests", "index.php?tests", $isOnPage);
+    if ($isOnPage) {
       $sub_menu = incomingSubmenu($page);
     }
     $result = $result." | ";

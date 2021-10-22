@@ -59,7 +59,7 @@
     if ($file_json["class"] == $class_id) {
       print("training-result ");
     }
-    if ($page->isAdmin()) {
+    if ($page->isAdmin() && !array_key_exists("tests", $_GET)) {
       if (array_key_exists("action", $file_json) && $file_json["action"] == $class_id) {
         print("selected");
       }
