@@ -48,13 +48,14 @@ class FileMover:
     if self.drop_files:
       self.logger.info("Remove {}".format(filename))
       os.remove(file_path)
-    else:
-      full_destination_path = os.path.join(self.destination_path, filename)
-      if os.path.exists(full_destination_path):
-        self.logger.error("Exist {}".format(full_destination_path))
-        os.remove(full_destination_path)
-      self.logger.info("Move {} => {}".format(file_path, self.destination_path))
-      shutil.move(str(file_path), str(self.destination_path))
+      return True
+    self.logger.debug("Need to move {}".format(file_path))
+    full_destination_path = os.path.join(self.destination_path, filename)
+    if os.path.exists(full_destination_path):
+      self.logger.error("Exist {}".format(full_destination_path))
+      os.remove(full_destination_path)
+    self.logger.info("Move {} => {}".format(file_path, self.destination_path))
+    shutil.move(str(file_path), str(self.destination_path))
     return True
 
 if __name__ == "__main__":
