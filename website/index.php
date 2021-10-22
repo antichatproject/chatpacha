@@ -113,11 +113,11 @@
       print("</a>");
       print("</td></tr>");
       print("<tr>");
-        print("<td>");
-        print("<b>".$date->format('H:i:s')."</b>");
-        print("</td><td>");
-        printProgressBar($file_json, $class_ids, $page);
-        print("</td>");
+      print("<td>");
+      print("<b>".$date->format('H:i:s')."</b>");
+      print("</td><td>");
+      printProgressBar($file_json, $class_ids, $page);
+      print("</td>");
       print("</table>\n");
     }
   }
