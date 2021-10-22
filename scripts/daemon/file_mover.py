@@ -20,7 +20,7 @@ class FileMover:
     self.destination_path = destination_path
     self.loop = loop or asyncio.get_event_loop()
     self.watcher = aionotify.Watcher()
-    self.watcher.watch(path = self.origin_path, flags = aionotify.Flags.MOVED_TO | aionotify.Flags.CREATE)
+    self.watcher.watch(path = self.origin_path, flags = aionotify.Flags.MOVED_TO | aionotify.Flags.CLOSE_WRITE)
     self.drop_files = False
     self.valid_extensions = [ ".jpg" ]
 
