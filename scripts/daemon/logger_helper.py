@@ -12,8 +12,7 @@ import antichat_config
 log_handler = None
 default_level = logging.INFO
 verbose_logging = "--verbose" in sys.argv
-#debug_mode = verbose_logging or "--debug-mode" in sys.argv
-debug_mode = "--debug-mode" in sys.argv
+debug_mode = "--debug" in sys.argv
 
 def get_logger(prefix):
   global log_handler
