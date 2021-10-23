@@ -34,6 +34,7 @@ class Deamon:
     self.mqtt = mqtt.MQTT()
 
   async def run(self):
+    self.logger.info("************** START **************")
     self.loop.create_task(self.incoming_directory_evaluater.run())
     self.loop.create_task(self.test_directory_evaluater.run())
     self.loop.create_task(self.incoming_file_mover.run())
