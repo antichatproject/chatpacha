@@ -46,11 +46,6 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
 class_names = train_ds.class_names
 print(class_names)
 
-for image_batch, labels_batch in train_ds:
-  print(image_batch.shape)
-  print(labels_batch.shape)
-  break
-
 loading_time = time.time() - start_time
 start_time = time.time()
 
@@ -58,6 +53,14 @@ AUTOTUNE = tf.data.AUTOTUNE
 
 train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+
+train_size = 0
+for image_batch, labels_batch in train_ds:
+  train_size += len(image_batch)
+val_size = 0
+for image_batch, labels_batch in val_ds:
+  val_size += len(image_batch)
+print("training size {}, validation size {}".format(train_size, val_size))
 
 normalization_layer = layers.experimental.preprocessing.Rescaling(1./255)
 
@@ -139,8 +142,8 @@ data = {
       antichat_config.cat_class_name: len(dataset_cat),
       antichat_config.no_cat_class_name: len(dataset_no_cat),
     },
-    "traning": int(train_ds.cardinality().numpy()),
-    "validation": int(val_ds.cardinality().numpy()),
+    "traning": train_size,
+    "validation": val_size,
   },
   "image_size": [ antichat_config.img_width, antichat_config.img_height],
   "training_time": training_time,
