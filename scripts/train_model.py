@@ -19,7 +19,7 @@ import antichat_config
 
 total_start_time = time.time()
 
-data_dir = pathlib.Path(antichat_config.generated_images_path)
+data_dir = pathlib.Path(antichat_config.classified_images_path)
 
 start_time = time.time()
 image_count = len(list(data_dir.glob('*/*.jpg')))
@@ -139,8 +139,8 @@ data = {
       antichat_config.cat_class_name: len(dataset_cat),
       antichat_config.no_cat_class_name: len(dataset_no_cat),
     },
-    "traning": int(total_picture_count * (1 - antichat_config.validation_split)),
-    "validation": int(total_picture_count * antichat_config.validation_split),
+    "traning": int(train_ds.cardinality().numpy()),
+    "validation": int(val_ds.cardinality().numpy()),
   },
   "image_size": [ antichat_config.img_width, antichat_config.img_height],
   "training_time": training_time,
