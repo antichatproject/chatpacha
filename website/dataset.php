@@ -21,7 +21,7 @@
   }
   $page_count = 100;
   $pictures = array();
-  $cdir = scandir("images/generated/".$class);
+  $cdir = scandir("images/classified_thub/".$class);
   $counter = 0;
   foreach ($cdir as $key => $filename) {
     $ext = pathinfo($filename, PATHINFO_EXTENSION);
@@ -50,7 +50,7 @@
   print(implode(" | ", $page_links));
   print("</div><br/>");
   foreach ($pictures as $_ => $filename) {
-    print("<a href='images/generated/".$class."/".$filename."'><img src='images/generated/".$class."/thumbnails/".$filename."' /></a>\n");
+    print("<a href='images/classified/".$class."/".$filename."'><img src='images/classified_thub/".$class."/".$filename."' /></a>\n");
   }
 ?>
   </body>

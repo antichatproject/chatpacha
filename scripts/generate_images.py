@@ -8,8 +8,9 @@ import sys
 
 import antichat_config
 
-def create_thumbnail(origin, filename, file_format):
-  destination = os.path.join(origin, "thumbnails")
+def create_thumbnail(origin, filename, file_format, destination = None):
+  if destination == None:
+    destination = os.path.join(origin, "thumbnails")
   if not os.path.exists(destination):
     os.makedirs(destination)
   copy_image(origin, filename, destination, file_format, "scale=320:-1")
@@ -36,27 +37,27 @@ def copy_image(origin, filename, destination, file_format, scale):
     exit(-1)
   return True
 
-def copy_images(origin, destination, file_format, scale = None):
-  for filename in os.listdir(origin):
-    copy_image(origin, filename, destination, file_format, scale)
-    create_thumbnail(destination, filename, file_format)
-
-def copy_all_class_images(origin, destination, file_format, scale = None):
-  for filename in os.listdir(origin):
-    copy_images(os.path.join(origin, filename), os.path.join(destination, filename), file_format, scale)
-
 def create_dir_if_needed(dir_path):
   if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
+def create_thumbnails(origin, class_names, destination, file_format, scale = None):
+  for class_name in class_names:
+    origin_class_path = os.path.join(origin, class_name)
+    destination_class_path = os.path.join(destination, class_name)
+    create_dir_if_needed(destination_class_path)
+    for filename in os.listdir(origin_class_path):
+      image_path = os.path.join(origin_class_path, filename)
+      create_thumbnail(origin_class_path, filename, antichat_config.picture_extension, destination_class_path)
+
 if __name__ == "__main__":
   image_source = antichat_config.classified_images_path
-  destination = antichat_config.generated_images_path
+  thumbnail_destination = antichat_config.classified_thumbnails_path
   if False:
     scale = "scale=320:-1"
   else:
     scale = None
   file_format = antichat_config.picture_extension
-  create_dir_if_needed(os.path.join(destination, antichat_config.cat_class_name))
-  create_dir_if_needed(os.path.join(destination, antichat_config.no_cat_class_name))
-  copy_all_class_images(image_source, destination, file_format, scale)
+  create_dir_if_needed(os.path.join(thumbnail_destination, antichat_config.cat_class_name))
+  create_dir_if_needed(os.path.join(thumbnail_destination, antichat_config.no_cat_class_name))
+  create_thumbnails(antichat_config.classified_images_path, antichat_config.class_names, thumbnail_destination, file_format, scale)

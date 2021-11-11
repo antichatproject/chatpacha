@@ -18,6 +18,7 @@ model_path = os.path.join(antichat_dir_path, "antichat_model")
 data_path = os.path.join(antichat_dir_path, "data")
 generated_images_path = os.path.join(data_path, "generated")
 classified_images_path = os.path.join(data_path, "classified")
+classified_thumbnails_path = os.path.join(data_path, "classified_thub")
 picture_extension = "jpg"
 
 # Notification

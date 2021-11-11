@@ -32,6 +32,22 @@ class Deamon:
     self.incoming_directory_evaluater.on_new_picture = self.on_new_picture
     self.test_directory_evaluater = directory_evaluater.DirectoryEvaluater(self.model, antichat_config.website_test_path)
     self.mqtt = mqtt.MQTT()
+    self.create_all_dirs()
+
+  def create_all_dirs(self):
+    main_dirs = [
+      antichat_config.classified_images_path,
+      os.path.join(antichat_config.classified_images_path, antichat_config.cat_class_name),
+      os.path.join(antichat_config.classified_images_path, antichat_config.no_cat_class_name),
+      antichat_config.classified_thumbnails_path,
+      os.path.join(antichat_config.classified_thumbnails_path, antichat_config.cat_class_name),
+      os.path.join(antichat_config.classified_thumbnails_path, antichat_config.no_cat_class_name),
+      antichat_config.website_incoming_path,
+      antichat_config.website_test_path,
+    ]
+    for my_dir in main_dirs:
+      if not os.path.exists(my_dir):
+        os.makedirs(my_dir)
 
   async def run(self):
     self.logger.info("************** START **************")
