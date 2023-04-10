@@ -10,6 +10,7 @@ import os
 import pathlib
 import pprint
 import shutil
+import subprocess
 import sys
 import time
 
@@ -21,9 +22,11 @@ import file_mover
 import logger_helper
 import model
 import mqtt
+import video_uploader
 
 class Deamon:
   def __init__(self, loop = None):
+    self.video_sent = {}
     self.logger = logger_helper.get_logger(self.__class__.__name__)
     self.loop = loop or asyncio.get_event_loop()
     self.model =  model.Model()
@@ -33,6 +36,7 @@ class Deamon:
     self.test_directory_evaluater = directory_evaluater.DirectoryEvaluater(self.model, antichat_config.website_test_path)
     self.mqtt = mqtt.MQTT()
     self.create_all_dirs()
+    self.video_uploader = video_uploader.VideoUploader(antichat_config)
 
   def create_all_dirs(self):
     main_dirs = [
@@ -56,6 +60,7 @@ class Deamon:
     self.loop.create_task(self.incoming_file_mover.run())
     self.loop.create_task(self.mqtt.run())
     self.loop.create_task(self.get_feedback())
+    self.loop.create_task(self.video_uploader.run())
 
   async def get_feedback(self):
     website_path = pathlib.Path(antichat_config.website_incoming_path)
@@ -105,9 +110,17 @@ class Deamon:
   def on_new_picture(self, image_path, data):
     try:
       if data["class"] == antichat_config.cat_class_name and data["score"] > antichat_config.cat_detection_threshold:
-        self.mqtt.cat_detected()
+        try:
+          self.mqtt.cat_detected(image_path)
+        except:
+          self.logger.exception("Send cat mqtt fail")
+        self.video_uploader.upload(data)
+      try:
+        pass
+      except:
+        self.logger.exception("Error to send video")
     except:
-      self.logger.exception("Send cat mqtt fail")
+      self.logger.exception("Process cat data fail")
 
 if __name__ == "__main__":
   loop = asyncio.get_event_loop()

@@ -13,10 +13,9 @@ img_height = 180
 cat_class_name = "chat"
 no_cat_class_name = "pas_chat"
 class_names = [ cat_class_name, no_cat_class_name ]
-validation_split = .01
+validation_split = .1
 model_path = os.path.join(antichat_dir_path, "antichat_model")
 data_path = os.path.join(antichat_dir_path, "data")
-generated_images_path = os.path.join(data_path, "generated")
 classified_images_path = os.path.join(data_path, "classified")
 classified_thumbnails_path = os.path.join(data_path, "classified_thub")
 picture_extension = "jpg"
@@ -30,6 +29,7 @@ cat_notification_limit_decount_period = 60 * 5
 log_path = "/var/log/antichat"
 
 ftp_snap_path = os.path.normpath(os.path.join(antichat_dir_path, "..", "cam", "FI9900P_00626E6778C6", "snap"))
+ftp_record_path = os.path.normpath(os.path.join(antichat_dir_path, "..", "cam", "FI9900P_00626E6778C6", "record"))
 
 website_path = os.path.join(antichat_dir_path, "website")
 website_images_path = os.path.join(website_path, "images")
@@ -41,15 +41,15 @@ website_training_path = os.path.join(website_path, "training")
 if __name__ == "__main__":
   path_to_test = {
     "model_path": model_path,
-    "generated_images_path": generated_images_path,
     "classified_images_path": classified_images_path,
     "data_path": data_path,
     "ftp_snap_path": ftp_snap_path,
-    "keep_video_path": keep_video_path,
+    "ftp_record_path": ftp_record_path,
     "website_path": website_path,
     "website_images_path": website_images_path,
     "website_test_path": website_test_path,
   }
+  print(antichat_dir_path)
   for path_name, path in path_to_test.items():
     if os.path.exists(path):
       print("{}: OK".format(path_name))

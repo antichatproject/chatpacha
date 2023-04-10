@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 
 import asyncio
+import json
 import pprint
 import time
 import gmqtt
@@ -14,7 +15,7 @@ import logger_helper
 
 ENABLED_TOPIC = "antichat/enabled"
 STATE_TOPIC = "antichat/state"
-CAT_DETECTED_TOPIC = "antichat/cat"
+CAT_DETECTED_TOPIC = "antichat/detected"
 
 class MQTT:
   def __init__(self, server = "127.0.0.1", loop = None):
@@ -82,7 +83,7 @@ class MQTT:
     else:
       self.logger.error("cat_notification_counter 0")
 
-  def cat_detected(self):
+  def cat_detected(self, image_path):
     try:
       if not self.enabled:
         return
@@ -93,7 +94,11 @@ class MQTT:
       elif (self.last_cat_notification is None or (time.time() - self.last_cat_notification > antichat_config.cat_notification_delay)) and self.cat_notification_counter < antichat_config.cat_notification_limit_count:
         self.logger.info("Send cat notification {}".format(self.cat_notification_counter))
         self.last_cat_notification = time.time()
-        self.client.publish(CAT_DETECTED_TOPIC, str(time.time()), qos = 1)
+        data = {
+          "timestamp": time.time(),
+          "image_path": image_path,
+        }
+        self.client.publish(CAT_DETECTED_TOPIC, json.dumps(data), qos = 1)
         if self.cat_notification_counter == 0:
           self.loop.create_task(self.decrease_cat_notification_counter())
         self.cat_notification_counter += 1
